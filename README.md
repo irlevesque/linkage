@@ -2,7 +2,7 @@
 
 ## Project
 
-A self-hosted search engine that redirects to specific sites (similar to golinks) if available, and otherwise redirects searches to a default search engine
+A self-hosted search engine that redirects to specific sites (similar to go/links).
 
 ## Features:
 
