@@ -13,5 +13,5 @@ A self-hosted search engine that redirects to specific sites (similar to go/link
 
 ## Example Usage
 
-`gh`: redirects to https://github.com
-`gh/irlevesque`: redirects to https://github.com/irlevesque
+- `gh`: redirects to https://github.com
+- `gh/irlevesque`: redirects to https://github.com/irlevesque
