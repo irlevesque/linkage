@@ -1,0 +1,91 @@
+package main
+
+import (
+	"net/http"
+	"strconv"
+
+	"github.com/gin-gonic/gin"
+)
+
+// searchEngine represents a fallback search engine configuration.
+type searchEngine struct {
+	Name      string `json:"name" form:"name" binding:"required"`
+	QueryURL  string `json:"query_url" form:"query_url" binding:"required"`
+	IsDefault bool   `json:"default" form:"default"`
+}
+
+// Default set of search engines.
+func NewDefaultSearchEngines() []*searchEngine {
+	return []*searchEngine{
+		{
+			Name:      "Google",
+			QueryURL:  "https://www.google.com/search?q=",
+			IsDefault: true,
+		},
+		{
+			Name:      "Bing",
+			QueryURL:  "https://www.bing.com/search?q=",
+			IsDefault: false,
+		},
+	}
+}
+
+var searchEngines []*searchEngine = NewDefaultSearchEngines()
+
+// getSearchEngines returns all search engines.
+func getSearchEngines(c *gin.Context) {
+	c.IndentedJSON(http.StatusOK, searchEngines)
+}
+
+// getCurrentSearchEngine returns the currently-default search engine.
+func getCurrentSearchEngine(c *gin.Context) {
+	for _, se := range searchEngines {
+		if se.IsDefault {
+			c.IndentedJSON(http.StatusOK, se)
+			return
+		}
+	}
+	// If none marked as default, return empty with 404 to signal no default present.
+	c.IndentedJSON(http.StatusNotFound, gin.H{"error": "No default search engine configured"})
+}
+
+func setDefaultSearchEngine(se *searchEngine, searchEngines []*searchEngine) bool {
+	for i := range searchEngines {
+		searchEngines[i].IsDefault = false
+	}
+
+	se.IsDefault = true
+	return true
+}
+
+// addSearchEngine adds a new search engine
+func addSearchEngine(c *gin.Context) {
+	newSearchEngine := searchEngine{Name: c.Param("name"), QueryURL: c.Param("query_url")}
+	c.IndentedJSON(http.StatusAccepted, gin.H{"default": c.Param("default")})
+
+	for _, e := range searchEngines {
+		if e.Name == newSearchEngine.Name {
+			c.IndentedJSON(http.StatusConflict, gin.H{"error": "Search engine already exists", "searchEngine": e})
+			return
+		}
+	}
+
+	isDefault, err := strconv.ParseBool(c.Param("default"))
+	if err != nil {
+		c.IndentedJSON(http.StatusBadRequest, gin.H{"error parsing default": err.Error()})
+		return
+	}
+
+	if err := c.ShouldBind(&newSearchEngine); err != nil {
+		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	searchEngines = append(searchEngines, &newSearchEngine)
+
+	if isDefault {
+		setDefaultSearchEngine(&newSearchEngine, searchEngines)
+	}
+
+	c.IndentedJSON(http.StatusCreated, newSearchEngine)
+}
