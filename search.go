@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"net/http"
 	"strconv"
 
@@ -35,6 +36,16 @@ var searchEngines []*searchEngine = NewDefaultSearchEngines()
 // getSearchEngines returns all search engines.
 func getSearchEngines(c *gin.Context) {
 	c.IndentedJSON(http.StatusOK, searchEngines)
+}
+
+func searchEngineQueryURL(term string) (error, string) {
+	for _, se := range searchEngines {
+		if se.IsDefault {
+			return nil, se.QueryURL + term
+		}
+	}
+	// If none marked as default, return empty with 404 to signal no default present.
+	return errors.New("No default search engine configured"), ""
 }
 
 // getCurrentSearchEngine returns the currently-default search engine.

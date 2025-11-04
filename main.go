@@ -4,17 +4,11 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func metaSearch(c *gin.Context) {
-	c.JSON(200, gin.H{
-		"message": "meta search",
-	})
-}
-
 func main() {
 	router := gin.Default()
 
 	// Query Endpoints
-	router.GET("/s", metaSearch)
+	router.GET("/", browserRequest)
 
 	// API Endpoints
 	{
