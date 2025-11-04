@@ -1,6 +1,6 @@
 # Linkage
 
-![Linkage Logo](assets/linkage.png)
+<img src="assets/linkage.png" width="120">
 
 ## Project
 
