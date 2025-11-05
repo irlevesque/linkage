@@ -1,4 +1,4 @@
-package main
+package handlers
 
 import (
 	"net/http"
@@ -8,6 +8,11 @@ import (
 
 func browserRequest(c *gin.Context) {
 	term := c.Query("s")
+
+	if term == "" {
+		c.String(http.StatusBadRequest, "Missing search term")
+		return
+	}
 
 	_, l := findLink(term)
 	if l != nil {
