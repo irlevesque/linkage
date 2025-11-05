@@ -1,10 +1,8 @@
-# Linkage
+<img src="assets/linkage.png" width="180">
 
-<img src="assets/linkage.png" width="120">
+## Linkage
 
-## Project
-
-A self-hosted search engine that redirects to specific sites (similar to go/links).
+A self-hosted search engine that redirects to specific sites (similar to [golinks](https://meta.wikimedia.org/wiki/Go_links)).
 
 ## Features:
 
@@ -23,4 +21,4 @@ A self-hosted search engine that redirects to specific sites (similar to go/link
 
 ## Setup
 
-On Chrome (and deriviative browsers), go to `settings` > `search engine` and add a new "Site search" engine with the name "Linkage" and the URL "http://localhost:8080/?s=%s"
+On Chrome (and deriviative browsers), go to `settings` > `search engine` and add a new "Site search" engine with the name "Linkage", shortcut "go", and the URL "http://localhost:8080/?s=%s" (assuming you're running locally on the default port).

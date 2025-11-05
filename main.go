@@ -6,11 +6,11 @@ import (
 
 func main() {
 	router := gin.Default()
-
+	router.StaticFile("/favicon.ico", "./assets/favicon.ico")
 	// Query Endpoints
 	router.GET("/", browserRequest)
 
-	// API Endpoints
+	// API Endpoints©
 	{
 		api := router.Group("/api")
 		// links
