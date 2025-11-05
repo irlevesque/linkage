@@ -1,13 +1,9 @@
-package main
-
-import (
-	"github.com/gin-gonic/gin"
-)
+package linkage
 
 func main() {
-	router := gin.Default()
+	// router := gin.Default()
 
-	router.StaticFile("/favicon.ico", "./assets/favicon.ico")
+	// router.StaticFile("/favicon.ico", "./assets/favicon.ico")
 
 	// // Query Endpoints
 	// router.GET("/", browserRequest)
@@ -27,5 +23,5 @@ func main() {
 	// 	api.POST("/search", addSearchEngine)
 	// }
 
-	router.Run(":8080")
+	// router.Run(":8080")
 }
