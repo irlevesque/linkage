@@ -1,27 +1,28 @@
-package linkage
+package main
+
+import (
+	"fmt"
+	"os"
+
+	"github.com/irlevesque/linkage/pkg/linkage"
+)
 
 func main() {
-	// router := gin.Default()
+	var listenIP string
+	var listenPort string
 
-	// router.StaticFile("/favicon.ico", "./assets/favicon.ico")
+	if v, ok := os.LookupEnv("LISTEN_IP"); ok {
+		listenIP = v
+	} else {
+		listenIP = "localhost"
+	}
 
-	// // Query Endpoints
-	// router.GET("/", browserRequest)
+	if v, ok := os.LookupEnv("LISTEN_PORT"); ok {
+		listenPort = v
+	} else {
+		listenPort = "8080"
+	}
 
-	// // API Endpoints
-	// {
-	// 	api := router.Group("/api")
-	// 	// links
-	// 	api.GET("/links", getLinks)
-	// 	api.GET("/link/:stub", getLink)
-	// 	api.POST("/link/:stub", addLink)
-	// 	api.DELETE("/link/:stub", deleteLink)
-
-	// 	// search handlers
-	// 	api.GET("/search/all", getSearchEngines)
-	// 	api.GET("/search/current", getCurrentSearchEngine)
-	// 	api.POST("/search", addSearchEngine)
-	// }
-
-	// router.Run(":8080")
+	linkageApp := linkage.New(fmt.Sprintf("%s:%s", listenIP, listenPort))
+	linkageApp.Serve()
 }

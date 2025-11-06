@@ -1,4 +1,4 @@
-module linkage
+module github.com/irlevesque/linkage
 
 go 1.25.3
 

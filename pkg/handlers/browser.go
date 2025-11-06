@@ -6,7 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func browserRequest(c *gin.Context) {
+func BrowserRequest(c *gin.Context) {
 	term := c.Query("s")
 
 	if term == "" {
@@ -20,7 +20,7 @@ func browserRequest(c *gin.Context) {
 		return
 	}
 
-	err, fallback := searchEngineQueryURL(term)
+	err, fallback := SearchEngineQueryURL(term)
 	if err != nil {
 		c.String(http.StatusInternalServerError, "Error: %s", err)
 		return

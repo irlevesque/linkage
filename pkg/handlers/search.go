@@ -34,11 +34,11 @@ func NewDefaultSearchEngines() []*searchEngine {
 var searchEngines []*searchEngine = NewDefaultSearchEngines()
 
 // getSearchEngines returns all search engines.
-func getSearchEngines(c *gin.Context) {
+func GetSearchEngines(c *gin.Context) {
 	c.IndentedJSON(http.StatusOK, searchEngines)
 }
 
-func searchEngineQueryURL(term string) (error, string) {
+func SearchEngineQueryURL(term string) (error, string) {
 	for _, se := range searchEngines {
 		if se.IsDefault {
 			return nil, se.QueryURL + term
@@ -49,7 +49,7 @@ func searchEngineQueryURL(term string) (error, string) {
 }
 
 // getCurrentSearchEngine returns the currently-default search engine.
-func getCurrentSearchEngine(c *gin.Context) {
+func GetCurrentSearchEngine(c *gin.Context) {
 	for _, se := range searchEngines {
 		if se.IsDefault {
 			c.IndentedJSON(http.StatusOK, se)
@@ -70,7 +70,7 @@ func setDefaultSearchEngine(se *searchEngine, searchEngines []*searchEngine) boo
 }
 
 // addSearchEngine adds a new search engine
-func addSearchEngine(c *gin.Context) {
+func AddSearchEngine(c *gin.Context) {
 	newSearchEngine := searchEngine{Name: c.Param("name"), QueryURL: c.Param("query_url")}
 	c.IndentedJSON(http.StatusAccepted, gin.H{"default": c.Param("default")})
 

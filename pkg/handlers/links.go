@@ -42,7 +42,7 @@ func findLink(stub string) (int, *link) {
 }
 
 // TODO: may want to refactor this if O(n) becomes too slow
-func deleteLink(c *gin.Context) {
+func DeleteLink(c *gin.Context) {
 	reqLink := c.Param("stub")
 	i, l := findLink(reqLink)
 	if l == nil {
@@ -53,11 +53,11 @@ func deleteLink(c *gin.Context) {
 	c.IndentedJSON(http.StatusOK, gin.H{"message": "Link deleted", "link": l})
 }
 
-func getLinks(c *gin.Context) {
+func GetLinks(c *gin.Context) {
 	c.IndentedJSON(http.StatusOK, links)
 }
 
-func getLink(c *gin.Context) {
+func GetLink(c *gin.Context) {
 	reqLink := c.Param("stub")
 	_, l := findLink(reqLink)
 	if l == nil {
@@ -67,7 +67,7 @@ func getLink(c *gin.Context) {
 	c.IndentedJSON(http.StatusOK, l)
 }
 
-func addLink(c *gin.Context) {
+func AddLink(c *gin.Context) {
 	var newLink = link{Stub: c.Param("stub")}
 	_, l := findLink(newLink.Stub)
 	if l != nil {
