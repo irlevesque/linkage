@@ -83,6 +83,6 @@ func AddLink(c *gin.Context) {
 		return
 	}
 	newLink.CreatedAt = time.Now()
-	links = append(links, newLink)
+	links = append(links, &newLink)
 	c.IndentedJSON(http.StatusCreated, newLink)
 }
