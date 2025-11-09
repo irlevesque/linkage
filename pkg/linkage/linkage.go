@@ -11,23 +11,23 @@ type Linkage struct {
 
 func New(address string) *Linkage {
 	app := new(Linkage)
+	if address == "" || address == ":" {
+		address = "localhost:8080"
+	}
 	app.Host = address
-	app.Configure()
+	app.App = gin.Default()
+	app.addRoutes()
 
 	return app
 }
 
-func (l *Linkage) Configure() {
-	l.App = gin.Default()
-	l.App.Use(gin.Logger())
-	l.App.Use(gin.Recovery())
+func (l *Linkage) Serve() {
+	l.App.Run(l.Host)
+}
 
+func (l *Linkage) addRoutes() {
 	routes := GetRoutes()
 	for _, route := range routes {
 		l.App.Handle(route.method, route.endpoint, route.handler)
 	}
-}
-
-func (l *Linkage) Serve() {
-	l.App.Run(l.Host)
 }

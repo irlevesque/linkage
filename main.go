@@ -8,21 +8,12 @@ import (
 )
 
 func main() {
-	var listenIP string
-	var listenPort string
+	listenIP := os.Getenv("LISTEN_IP")
+	listenPort := os.Getenv("LISTEN_PORT")
 
-	if v, ok := os.LookupEnv("LISTEN_IP"); ok {
-		listenIP = v
-	} else {
-		listenIP = "localhost"
-	}
+	linkage.LoadConfig()
 
-	if v, ok := os.LookupEnv("LISTEN_PORT"); ok {
-		listenPort = v
-	} else {
-		listenPort = "8080"
-	}
-
+	// defaults to localhost:8080 if not specified
 	linkageApp := linkage.New(fmt.Sprintf("%s:%s", listenIP, listenPort))
 	linkageApp.Serve()
 }

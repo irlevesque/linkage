@@ -9,15 +9,15 @@ import (
 )
 
 // searchEngine represents a fallback search engine configuration.
-type searchEngine struct {
+type SearchEngine struct {
 	Name      string `json:"name" form:"name" binding:"required"`
 	QueryURL  string `json:"query_url" form:"query_url" binding:"required"`
 	IsDefault bool   `json:"default" form:"default"`
 }
 
-// Default set of search engines.
-func NewDefaultSearchEngines() []*searchEngine {
-	return []*searchEngine{
+// NewSearchEngines returns a slice of available search engines.
+func NewSearchEngines() []*SearchEngine {
+	return []*SearchEngine{
 		{
 			Name:      "Google",
 			QueryURL:  "https://www.google.com/search?q=",
@@ -31,7 +31,7 @@ func NewDefaultSearchEngines() []*searchEngine {
 	}
 }
 
-var searchEngines []*searchEngine = NewDefaultSearchEngines()
+var searchEngines []*SearchEngine = NewSearchEngines()
 
 // getSearchEngines returns all search engines.
 func GetSearchEngines(c *gin.Context) {
@@ -60,7 +60,7 @@ func GetCurrentSearchEngine(c *gin.Context) {
 	c.IndentedJSON(http.StatusNotFound, gin.H{"error": "No default search engine configured"})
 }
 
-func setDefaultSearchEngine(se *searchEngine, searchEngines []*searchEngine) bool {
+func setDefaultSearchEngine(se *SearchEngine, searchEngines []*SearchEngine) bool {
 	for i := range searchEngines {
 		searchEngines[i].IsDefault = false
 	}
@@ -71,7 +71,7 @@ func setDefaultSearchEngine(se *searchEngine, searchEngines []*searchEngine) boo
 
 // addSearchEngine adds a new search engine
 func AddSearchEngine(c *gin.Context) {
-	newSearchEngine := searchEngine{Name: c.Param("name"), QueryURL: c.Param("query_url")}
+	newSearchEngine := SearchEngine{Name: c.Param("name"), QueryURL: c.Param("query_url")}
 	c.IndentedJSON(http.StatusAccepted, gin.H{"default": c.Param("default")})
 
 	for _, e := range searchEngines {

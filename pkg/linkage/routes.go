@@ -11,6 +11,8 @@ type LinkageRoute struct {
 	handler  gin.HandlerFunc
 }
 
+var apiBasePath = "/api"
+
 // GetRoutes returns a slice of LinkageRoutes representing available request routes
 func GetRoutes() []LinkageRoute {
 	var routes = []LinkageRoute{
@@ -21,37 +23,37 @@ func GetRoutes() []LinkageRoute {
 		},
 		LinkageRoute{
 			method:   "GET",
-			endpoint: "/links",
+			endpoint: apiBasePath + "/links",
 			handler:  handlers.GetLinks,
 		},
 		LinkageRoute{
 			method:   "GET",
-			endpoint: "/link/:stub",
+			endpoint: apiBasePath + "/link/:stub",
 			handler:  handlers.GetLink,
 		},
 		LinkageRoute{
 			method:   "POST",
-			endpoint: "/link/:stub",
+			endpoint: apiBasePath + "/link/:stub",
 			handler:  handlers.AddLink,
 		},
 		LinkageRoute{
 			method:   "DELETE",
-			endpoint: "/link/:stub",
+			endpoint: apiBasePath + "/link/:stub",
 			handler:  handlers.DeleteLink,
 		},
 		LinkageRoute{
 			method:   "GET",
-			endpoint: "/search/all",
+			endpoint: apiBasePath + "/search/all",
 			handler:  handlers.GetSearchEngines,
 		},
 		LinkageRoute{
 			method:   "GET",
-			endpoint: "/search/current",
+			endpoint: apiBasePath + "/search/current",
 			handler:  handlers.GetCurrentSearchEngine,
 		},
 		LinkageRoute{
 			method:   "POST",
-			endpoint: "/search",
+			endpoint: apiBasePath + "/search",
 			handler:  handlers.AddSearchEngine,
 		},
 	}

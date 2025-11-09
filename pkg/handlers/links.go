@@ -7,35 +7,38 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-type link struct {
+type Link struct {
 	Stub        string    `json:"stub" form:"stub" binding:"required"`
 	URL         string    `json:"url" form:"url" binding:"required"`
-	Description string    `json:"description" form:"description"`
+	Description string    `json:"description,omitempty" form:"description"`
 	CreatedAt   time.Time `json:"created_at"`
 }
 
 var bday = time.Date(2025, time.November, 3, 0, 0, 0, 0, time.UTC)
 
-// links defines the default slice of links
-var links = []link{
-	{
-		Stub:        "gh",
-		URL:         "https://github.com",
-		Description: "GitHub",
-		CreatedAt:   bday,
-	},
-	{
-		Stub:        "linkage",
-		URL:         "https://github.com/irlevesque/linkage",
-		Description: "Linkage",
-		CreatedAt:   bday,
-	},
+func NewLinks() []*Link {
+	return []*Link{
+		{
+			Stub:        "gh",
+			URL:         "https://github.com",
+			Description: "GitHub",
+			CreatedAt:   bday,
+		},
+		{
+			Stub:        "linkage",
+			URL:         "https://github.com/irlevesque/linkage",
+			Description: "Linkage",
+			CreatedAt:   bday,
+		},
+	}
 }
 
-func findLink(stub string) (int, *link) {
+var links []*Link = NewLinks()
+
+func findLink(stub string) (int, *Link) {
 	for i, l := range links {
 		if l.Stub == stub {
-			return i, &l
+			return i, l
 		}
 	}
 	return -1, nil
@@ -68,7 +71,7 @@ func GetLink(c *gin.Context) {
 }
 
 func AddLink(c *gin.Context) {
-	var newLink = link{Stub: c.Param("stub")}
+	var newLink = Link{Stub: c.Param("stub")}
 	_, l := findLink(newLink.Stub)
 	if l != nil {
 		c.IndentedJSON(http.StatusConflict, gin.H{"error": "Link already exists", "link": l})
