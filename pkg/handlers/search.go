@@ -31,15 +31,27 @@ func NewSearchEngines() []*SearchEngine {
 	}
 }
 
-var searchEngines []*SearchEngine = NewSearchEngines()
+var SearchEngines []*SearchEngine
+
+// SearchEngineConfigWriter defines the interface for persisting SEs to disk
+type SearchEngineConfigWriter interface {
+	SaveSearchEngines(se []*SearchEngine) error
+}
+
+var searchEngineConfigWriter SearchEngineConfigWriter
+
+// SetSearchEngineConfigWriter sets the writer for SEs
+func SetSearchEngineConfigWriter(writer SearchEngineConfigWriter) {
+	searchEngineConfigWriter = writer
+}
 
 // getSearchEngines returns all search engines.
 func GetSearchEngines(c *gin.Context) {
-	c.IndentedJSON(http.StatusOK, searchEngines)
+	c.IndentedJSON(http.StatusOK, SearchEngines)
 }
 
 func SearchEngineQueryURL(term string) (error, string) {
-	for _, se := range searchEngines {
+	for _, se := range SearchEngines {
 		if se.IsDefault {
 			return nil, se.QueryURL + term
 		}
@@ -50,7 +62,7 @@ func SearchEngineQueryURL(term string) (error, string) {
 
 // getCurrentSearchEngine returns the currently-default search engine.
 func GetCurrentSearchEngine(c *gin.Context) {
-	for _, se := range searchEngines {
+	for _, se := range SearchEngines {
 		if se.IsDefault {
 			c.IndentedJSON(http.StatusOK, se)
 			return
@@ -74,7 +86,7 @@ func AddSearchEngine(c *gin.Context) {
 	newSearchEngine := SearchEngine{Name: c.Param("name"), QueryURL: c.Param("query_url")}
 	c.IndentedJSON(http.StatusAccepted, gin.H{"default": c.Param("default")})
 
-	for _, e := range searchEngines {
+	for _, e := range SearchEngines {
 		if e.Name == newSearchEngine.Name {
 			c.IndentedJSON(http.StatusConflict, gin.H{"error": "Search engine already exists", "searchEngine": e})
 			return
@@ -92,10 +104,15 @@ func AddSearchEngine(c *gin.Context) {
 		return
 	}
 
-	searchEngines = append(searchEngines, &newSearchEngine)
+	SearchEngines = append(SearchEngines, &newSearchEngine)
 
 	if isDefault {
-		setDefaultSearchEngine(&newSearchEngine, searchEngines)
+		setDefaultSearchEngine(&newSearchEngine, SearchEngines)
+	}
+
+	if err := searchEngineConfigWriter.SaveSearchEngines(SearchEngines); err != nil {
+		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
 	}
 
 	c.IndentedJSON(http.StatusCreated, newSearchEngine)

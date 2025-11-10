@@ -21,4 +21,9 @@ A self-hosted search engine that redirects to specific sites (similar to [golink
 
 ## Setup
 
-On Chrome (and deriviative browsers), go to `settings` > `search engine` and add a new "Site search" engine with the name "Linkage", shortcut "go", and the URL "http://localhost:8080/?s=%s" (assuming you're running locally on the default port).
+### Chrome (and deriviative browsers):
+
+Go to `settings` > `search engine` and add a new "Site search" engine:
+- Name: "Linkage"
+- Shortcut: "go"
+- URL: "http://localhost:8080/?s=%s" (assuming you're running locally on the default port).

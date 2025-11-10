@@ -14,6 +14,18 @@ type Link struct {
 	CreatedAt   time.Time `json:"created_at"`
 }
 
+// LinkConfigWriter defines the interface for updating configuration files.
+type LinkConfigWriter interface {
+	SaveLinks(links []*Link) error
+}
+
+var linkConfigWriter LinkConfigWriter
+
+// LinkConfigWriter sets the configuration updater for links.
+func SetLinkConfigWriter(writer LinkConfigWriter) {
+	linkConfigWriter = writer
+}
+
 var bday = time.Date(2025, time.November, 3, 0, 0, 0, 0, time.UTC)
 
 func NewLinks() []*Link {
@@ -33,10 +45,10 @@ func NewLinks() []*Link {
 	}
 }
 
-var links []*Link = NewLinks()
+var Links []*Link
 
 func findLink(stub string) (int, *Link) {
-	for i, l := range links {
+	for i, l := range Links {
 		if l.Stub == stub {
 			return i, l
 		}
@@ -52,12 +64,12 @@ func DeleteLink(c *gin.Context) {
 		c.IndentedJSON(http.StatusNotFound, gin.H{"error": "Link not found"})
 		return
 	}
-	links = append(links[:i], links[i+1:]...)
+	Links = append(Links[:i], Links[i+1:]...)
 	c.IndentedJSON(http.StatusOK, gin.H{"message": "Link deleted", "link": l})
 }
 
 func GetLinks(c *gin.Context) {
-	c.IndentedJSON(http.StatusOK, links)
+	c.IndentedJSON(http.StatusOK, Links)
 }
 
 func GetLink(c *gin.Context) {
@@ -83,6 +95,10 @@ func AddLink(c *gin.Context) {
 		return
 	}
 	newLink.CreatedAt = time.Now()
-	links = append(links, &newLink)
+	Links = append(Links, &newLink)
+	if err := linkConfigWriter.SaveLinks(Links); err != nil {
+		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "Failed to update config: " + err.Error()})
+		return
+	}
 	c.IndentedJSON(http.StatusCreated, newLink)
 }
