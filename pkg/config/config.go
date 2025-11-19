@@ -67,38 +67,34 @@ func createInitialConfig(filePath string, fileConfig *FileConfig) error {
 
 // LoadConfig loads the JSON configuration from the specified file path.
 func LoadConfig() (*ConfigManager, error) {
-	var err error
-	fileConfig := &FileConfig{} // Initialize the fileConfig struct
+	fileConfig := &FileConfig{}
 
-	_, err = os.Stat(configPath)
-	if err != nil && errors.Is(err, os.ErrNotExist) {
-		log.Printf("Linkage config directory doesn't exist. Creating %s", configPath)
-		mkdirErr := os.Mkdir(configPath, os.FileMode(0755))
-		if mkdirErr != nil {
-			return nil, fmt.Errorf("unable to create linkage configuration directory: %w", mkdirErr)
-		}
-	} else if err != nil { // Handle other potential errors from os.Stat
-		return nil, fmt.Errorf("error stating config directory: %w", err)
-	}
-
-	_, err = os.Stat(configFile)
-	if errors.Is(err, os.ErrNotExist) {
-		if err := createInitialConfig(configFile, fileConfig); err != nil {
-			return nil, err
-		}
-	} else if err != nil { // Handle other potential errors from os.Stat
-		return nil, fmt.Errorf("error stating config file: %w", err)
+	if err := os.MkdirAll(configPath, os.FileMode(0755)); err != nil {
+		return nil, fmt.Errorf("unable to create linkage configuration directory: %w", err)
 	}
 
 	jsonConfig, err := os.ReadFile(configFile)
 	if err != nil {
-		return nil, fmt.Errorf("error reading config file: %w", err)
+		if errors.Is(err, os.ErrNotExist) {
+			if err := createInitialConfig(configFile, fileConfig); err != nil {
+				return nil, err
+			}
+			// After creating, read the file again
+			jsonConfig, err = os.ReadFile(configFile)
+			if err != nil {
+				return nil, fmt.Errorf("error reading newly created config file: %w", err)
+			}
+		} else {
+			return nil, fmt.Errorf("error reading config file: %w", err)
+		}
 	}
 
-	err = json.Unmarshal(jsonConfig, fileConfig)
-	if err != nil {
+	if err := json.Unmarshal(jsonConfig, fileConfig); err != nil {
 		return nil, fmt.Errorf("error parsing config file: %w", err)
 	}
+
+	log.Printf("Successfully loaded %d search engines and %d links from %s",
+		len(fileConfig.SearchEngines), len(fileConfig.Links), configFile)
 
 	// Update handlers' package-level variables
 	handlers.SearchEngines = fileConfig.SearchEngines

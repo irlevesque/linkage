@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"os"
 
@@ -22,7 +21,6 @@ func main() {
 	handlers.SetLinkConfigWriter(configManager)
 	handlers.SetSearchEngineConfigWriter(configManager)
 
-	// defaults to localhost:8080 if not specified
-	linkageApp := linkage.New(fmt.Sprintf("%s:%s", listenIP, listenPort))
+	linkageApp := linkage.New(listenIP, listenPort)
 	linkageApp.Serve()
 }

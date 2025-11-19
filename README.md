@@ -8,10 +8,10 @@ A self-hosted search engine that redirects to specific sites (similar to [golink
 
 - Redirects to specific sites if the "search term" is available
 - Redirects searches to a fallback search engine if no links are found
+- Appends any additionally-supplied parameters to the redirected URL
 
 ## Planned Features
 
-- Appends any additionally-supplied parameters to the redirected URL
 - Token-based authenticated REST API for link management and fallback search engine behavior
 
 ## Example Usage

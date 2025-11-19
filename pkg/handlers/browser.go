@@ -1,7 +1,9 @@
 package handlers
 
 import (
+	"log"
 	"net/http"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 )
@@ -14,9 +16,20 @@ func BrowserRequest(c *gin.Context) {
 		return
 	}
 
-	_, l := findLink(term)
+	// isolate the search term from the query string
+	var stub, args string
+	if strings.Contains(term, "/") {
+		stub = term[:strings.Index(term, "/")]
+		args = term[strings.Index(term, "/"):]
+		log.Printf("Evaluating stub %s and more %s\n", stub, args)
+	} else {
+		stub = term
+		args = ""
+	}
+
+	_, l := findLink(stub)
 	if l != nil {
-		c.Redirect(http.StatusMovedPermanently, l.URL)
+		c.Redirect(http.StatusMovedPermanently, l.URL+args)
 		return
 	}
 

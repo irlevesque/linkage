@@ -56,18 +56,6 @@ func findLink(stub string) (int, *Link) {
 	return -1, nil
 }
 
-// TODO: may want to refactor this if O(n) becomes too slow
-func DeleteLink(c *gin.Context) {
-	reqLink := c.Param("stub")
-	i, l := findLink(reqLink)
-	if l == nil {
-		c.IndentedJSON(http.StatusNotFound, gin.H{"error": "Link not found"})
-		return
-	}
-	Links = append(Links[:i], Links[i+1:]...)
-	c.IndentedJSON(http.StatusOK, gin.H{"message": "Link deleted", "link": l})
-}
-
 func GetLinks(c *gin.Context) {
 	c.IndentedJSON(http.StatusOK, Links)
 }
@@ -101,4 +89,20 @@ func AddLink(c *gin.Context) {
 		return
 	}
 	c.IndentedJSON(http.StatusCreated, newLink)
+}
+
+// TODO: may want to refactor this if O(n) becomes too slow
+func DeleteLink(c *gin.Context) {
+	reqLink := c.Param("stub")
+	i, l := findLink(reqLink)
+	if l == nil {
+		c.IndentedJSON(http.StatusNotFound, gin.H{"error": "Link not found"})
+		return
+	}
+	Links = append(Links[:i], Links[i+1:]...)
+	if err := linkConfigWriter.SaveLinks(Links); err != nil {
+		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "Failed to update config: " + err.Error()})
+		return
+	}
+	c.IndentedJSON(http.StatusOK, gin.H{"message": "Link deleted", "link": l})
 }

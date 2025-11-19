@@ -3,7 +3,7 @@ package handlers
 import (
 	"errors"
 	"net/http"
-	"strconv"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 )
@@ -19,12 +19,12 @@ type SearchEngine struct {
 func NewSearchEngines() []*SearchEngine {
 	return []*SearchEngine{
 		{
-			Name:      "Google",
+			Name:      "google",
 			QueryURL:  "https://www.google.com/search?q=",
 			IsDefault: true,
 		},
 		{
-			Name:      "Bing",
+			Name:      "bing",
 			QueryURL:  "https://www.bing.com/search?q=",
 			IsDefault: false,
 		},
@@ -45,11 +45,12 @@ func SetSearchEngineConfigWriter(writer SearchEngineConfigWriter) {
 	searchEngineConfigWriter = writer
 }
 
-// getSearchEngines returns all search engines.
+// GetSearchEngines returns all search engines.
 func GetSearchEngines(c *gin.Context) {
 	c.IndentedJSON(http.StatusOK, SearchEngines)
 }
 
+// SearchEngineQueryURL returns a URL for redirecting to the default search engine
 func SearchEngineQueryURL(term string) (error, string) {
 	for _, se := range SearchEngines {
 		if se.IsDefault {
@@ -60,8 +61,8 @@ func SearchEngineQueryURL(term string) (error, string) {
 	return errors.New("No default search engine configured"), ""
 }
 
-// getCurrentSearchEngine returns the currently-default search engine.
-func GetCurrentSearchEngine(c *gin.Context) {
+// getDefaultSearchEngine returns the current default search engine.
+func GetDefaultSearchEngine(c *gin.Context) {
 	for _, se := range SearchEngines {
 		if se.IsDefault {
 			c.IndentedJSON(http.StatusOK, se)
@@ -72,19 +73,41 @@ func GetCurrentSearchEngine(c *gin.Context) {
 	c.IndentedJSON(http.StatusNotFound, gin.H{"error": "No default search engine configured"})
 }
 
-func setDefaultSearchEngine(se *SearchEngine, searchEngines []*SearchEngine) bool {
+func setDefaultSearchEngine(se *SearchEngine, searchEngines []*SearchEngine) error {
 	for i := range searchEngines {
 		searchEngines[i].IsDefault = false
 	}
 
 	se.IsDefault = true
-	return true
+
+	if err := searchEngineConfigWriter.SaveSearchEngines(SearchEngines); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func SetDefaultSearchEngine(c *gin.Context) {
+	d := strings.ToLower(c.Param("name"))
+	for _, se := range SearchEngines {
+		if se.Name == d {
+			if err := setDefaultSearchEngine(se, SearchEngines); err != nil {
+				c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "Failed to update config: " + err.Error()})
+			}
+			c.IndentedJSON(http.StatusAccepted, se)
+			return
+		}
+	}
+	c.IndentedJSON(http.StatusNotFound, gin.H{"error": "Search engine not found"})
 }
 
 // addSearchEngine adds a new search engine
 func AddSearchEngine(c *gin.Context) {
-	newSearchEngine := SearchEngine{Name: c.Param("name"), QueryURL: c.Param("query_url")}
-	c.IndentedJSON(http.StatusAccepted, gin.H{"default": c.Param("default")})
+	var newSearchEngine SearchEngine
+	if err := c.ShouldBind(&newSearchEngine); err != nil {
+		c.IndentedJSON(http.StatusBadRequest, gin.H{"error parsing input": err.Error()})
+		return
+	}
 
 	for _, e := range SearchEngines {
 		if e.Name == newSearchEngine.Name {
@@ -93,27 +116,32 @@ func AddSearchEngine(c *gin.Context) {
 		}
 	}
 
-	isDefault, err := strconv.ParseBool(c.Param("default"))
-	if err != nil {
-		c.IndentedJSON(http.StatusBadRequest, gin.H{"error parsing default": err.Error()})
-		return
-	}
-
-	if err := c.ShouldBind(&newSearchEngine); err != nil {
-		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
-	}
-
 	SearchEngines = append(SearchEngines, &newSearchEngine)
 
-	if isDefault {
+	if newSearchEngine.IsDefault {
 		setDefaultSearchEngine(&newSearchEngine, SearchEngines)
 	}
 
 	if err := searchEngineConfigWriter.SaveSearchEngines(SearchEngines); err != nil {
-		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error saving to disk: ": err.Error()})
 		return
 	}
 
 	c.IndentedJSON(http.StatusCreated, newSearchEngine)
+}
+
+func DeleteSearchEngine(c *gin.Context) {
+	name := strings.ToLower(c.Param("name"))
+	for i, se := range SearchEngines {
+		if se.Name == name {
+			SearchEngines = append(SearchEngines[:i], SearchEngines[i+1:]...)
+			if err := searchEngineConfigWriter.SaveSearchEngines(SearchEngines); err != nil {
+				c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+				return
+			}
+			c.IndentedJSON(http.StatusOK, gin.H{"message": "Search engine deleted", "searchEngine": se})
+			return
+		}
+	}
+	c.IndentedJSON(http.StatusNotFound, gin.H{"error": "Search engine not found"})
 }
