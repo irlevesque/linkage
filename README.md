@@ -1,5 +1,3 @@
-<img src="assets/linkage.png" width="180">
-
 # Linkage
 
 A self-hosted replacement search engine that redirects Linkage Terms to specific addresses (inspired by [golinks](https://meta.wikimedia.org/wiki/Go_links)). Unmatched terms are passed through to your preferred search engine.
