@@ -38,7 +38,7 @@ func NewLinks() []*Link {
 		},
 		{
 			Stub:        "linkage",
-			URL:         "https://github.com/irlevesque/linkage",
+			URL:         "%s:%s",
 			Description: "Linkage",
 			CreatedAt:   bday,
 		},
@@ -47,6 +47,7 @@ func NewLinks() []*Link {
 
 var Links []*Link
 
+// TODO: may want to refactor this to use a map if O(n) becomes too slow
 func findLink(stub string) (int, *Link) {
 	for i, l := range Links {
 		if l.Stub == stub {
@@ -91,7 +92,6 @@ func AddLink(c *gin.Context) {
 	c.IndentedJSON(http.StatusCreated, newLink)
 }
 
-// TODO: may want to refactor this if O(n) becomes too slow
 func DeleteLink(c *gin.Context) {
 	reqLink := c.Param("stub")
 	i, l := findLink(reqLink)
