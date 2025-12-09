@@ -1,2 +1,5 @@
 .zed/
 tmp/
+
+# don't commit binary
+linkage
