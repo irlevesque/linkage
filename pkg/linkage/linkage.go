@@ -1,6 +1,8 @@
 package linkage
 
 import (
+	"net/http" // Required for http.Dir
+
 	"github.com/gin-gonic/gin"
 	"github.com/irlevesque/linkage/pkg/handlers"
 	"github.com/irlevesque/linkage/pkg/routes"
@@ -41,6 +43,9 @@ func (l *Linkage) addRoutes() {
 	for _, r := range routes.GetApiRoutes() {
 		l.App.Handle(r.Method, r.Endpoint, r.Handler)
 	}
+
+	// Serve the web UI from /ui
+	l.App.StaticFS("/ui", http.Dir("assets/ui"))
 
 	reflect := routes.GetReflection()
 	l.App.Handle("GET", routes.ApiBasePath, handlers.GetRoutesHandler(reflect))

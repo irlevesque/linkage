@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Linkage API Manager</title>
+        <link rel="stylesheet" href="style.css" />
+    </head>
+    <body>
+        <div class="container">
+            <h1>Linkage API Manager</h1>
+            <section id="links-management">
+                <h2>Linkages</h2>
+                <div class="card">
+                    <h3>Add New Linkage</h3>
+                    <form id="addLinkForm">
+                        <input
+                            type="text"
+                            id="stubInput"
+                            placeholder="Stub (e.g. 'gh')"
+                            required
+                        />
+                        <input
+                            type="text"
+                            id="urlInput"
+                            placeholder="URL (e.g. 'https://github.com')"
+                            required
+                        />
+                        <input
+                            type="text"
+                            id="descriptionInput"
+                            placeholder="Description (optional)"
+                        />
+                        <button type="submit">Add Linkage</button>
+                    </form>
+                </div>
+                <div class="card">
+                    <div id="getLinksOutput">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th align="left" width="20%">Stub</th>
+                                    <th align="left" width="40%">URL</th>
+                                    <th align="left" width="30%">
+                                        Description
+                                    </th>
+                                    <th align="left" width="10%">Delete</th>
+                                </tr>
+                            </thead>
+                            <tbody id="linksTableBody">
+                                <!-- Links will be populated here -->
+                            </tbody>
+                        </table>
+                    </div>
+                    <br />
+                    <button onclick="getLinks()">Refresh</button>
+                </div>
+            </section>
+
+            <section id="search-engines-management">
+                <h2>Fallback Search Engines</h2>
+                <div class="card">
+                    <h3>Add New Search Engine</h3>
+                    <form id="addSearchEngineForm">
+                        <input
+                            type="text"
+                            id="searchEngineNameInput"
+                            placeholder="Name (e.g. 'Google')"
+                            required
+                        />
+                        <input
+                            type="text"
+                            id="searchEngineQueryUrlInput"
+                            placeholder="Query URL (e.g. 'https://www.google.com/search?q=')"
+                            required
+                        />
+                        <button type="submit">Add Search Engine</button>
+                    </form>
+                </div>
+                <div class="card">
+                    <div id="getSearchEnginesOutput">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th align="left" width="20%">Name</th>
+                                    <th align="left" width="60%">Query URL</th>
+                                    <th align="left" width="10%">Default</th>
+                                    <th align="left" width="10%">Delete</th>
+                                </tr>
+                            </thead>
+                            <tbody id="searchEnginesTableBody">
+                                <!-- Search Engines will be populated here -->
+                            </tbody>
+                        </table>
+                    </div>
+                    <br />
+                    <button onclick="getSearchEngines()">Refresh</button>
+                </div>
+            </section>
+        </div>
+
+        <script src="script.js"></script>
+    </body>
+</html>
