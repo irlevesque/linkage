@@ -7,11 +7,11 @@ A self-hosted replacement search engine that redirects Linkage Terms to specific
 - Redirects you to specific sites if the "search term" is a Linkage term.
 - Appends any additionally-supplied parameters to the redirected linkage URL.
 - Redirects searches to a user-defined fallback search engine if no links are found.
+- Web-based interface for link management and fallback search engine behavior
 - No analytics or tracking. Everything is in your control.
 
 ### Planned Features
 
-- Web-based interface for link management and fallback search engine behavior
 - Preserve URL query parameters
 
 ### Currently Unplanned Features
@@ -26,6 +26,10 @@ Otherwise, you can type `go` followed by a space and the linkage / search term.
 The default configuration includes the `gh` linkage which redirects to github. Therefore, you can test the "Search engine" configuration via:
 - _(go)_ `gh`: redirects to https://github.com
 - _(go)_ `gh/irlevesque`: redirects to https://github.com/irlevesque
+
+## Web-based management interface
+
+Visit http://localhost:8080/ui to manage linkages and configure the fallback search engine.
 
 ## Setup
 
